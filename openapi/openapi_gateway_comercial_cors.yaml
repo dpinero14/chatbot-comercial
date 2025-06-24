@@ -1,0 +1,156 @@
+swagger: "2.0"
+info:
+  title: API Comerciales Andreani
+  description: Protegida con API Key para consulta de ejecutivos asignados a marcas.
+  version: 1.0.0
+
+schemes:
+  - https
+
+x-google-backend:
+  address: https://chatbot-comercial-386846500093.us-central1.run.app
+
+paths:
+  /:
+    post:
+      summary: Consultar comercial
+      operationId: consultarComercial
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              pregunta:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              respuesta:
+                type: string
+              marca_detectada:
+                type: string
+              nombre_fantasia:
+                type: string
+              razon_social:
+                type: string
+              ejecutivo:
+                type: string
+      security:
+        - api_key: []
+    
+    options:
+      summary: CORS preflight
+      operationId: corsPreflightRoot
+      responses:
+        '204':
+          description: No content
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "*"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization"
+      security: []
+
+  /consulta-con-imagen:
+    post:
+      summary: Consultar comercial con comentario e imagen
+      operationId: consultaConImagen
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              comentario:
+                type: string
+              imagen:
+                type: string
+                description: Imagen en base64
+      responses:
+        '200':
+          description: Comercial detectado
+          schema:
+            type: object
+            properties:
+              marca_detectada:
+                type: string
+              nombre_fantasia:
+                type: string
+              razon_social:
+                type: string
+              ejecutivo:
+                type: string
+              descripcion_imagen:
+                type: string
+              respuesta:
+                type: string
+      security:
+        - api_key: []
+
+    options:
+      summary: CORS preflight
+      operationId: corsPreflightImagen
+      responses:
+        '204':
+          description: No content
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "*"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization"
+      security: []
+
+  /cors:
+    options:
+      summary: CORS preflight support
+      operationId: corsHandler
+      responses:
+        '204':
+          description: No content
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "*"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization"
+      security: []
+      x-google-backend:
+        address: https://chatbot-comercial-386846500093.us-central1.run.app
+
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: x-api-key
+    in: header
+
+x-google-endpoints:
+  - name: chatbot-comercial-386846500093.us-central1.run.app
+    allowCors: true
