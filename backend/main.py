@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from google.cloud import bigquery
+import os
 import re
 import logging
 from openai import AzureOpenAI
@@ -10,13 +11,13 @@ from fastapi.responses import JSONResponse
 
 
 # --- Configuración general ---
-PROJECT_ID = "advanced-analytics-dev-440814"
-TABLE_ID = "comerciales.comerciales_cuentas"
+PROJECT_ID = os.getenv("PROJECT_ID", "advanced-analytics-dev-440814")
+TABLE_ID = os.getenv("TABLE_ID", "comerciales.comerciales_cuentas")
 
 # --- Configuración Azure OpenAI ---
-endpoint_llm = "https://prueba-diego-aa.openai.azure.com/"
-deployment_llm = "gpt-4o"
-api_key_llm = "9ea7440cfca84e5c82d42811be968b34"
+endpoint_llm = os.getenv("AZURE_OPENAI_ENDPOINT", "https://prueba-diego-aa.openai.azure.com/")
+deployment_llm = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
+api_key_llm = os.getenv("AZURE_OPENAI_KEY", "9ea7440cfca84e5c82d42811be968b34")
 
 client_llm = AzureOpenAI(
     azure_endpoint=endpoint_llm,
@@ -26,7 +27,8 @@ client_llm = AzureOpenAI(
 
 # --- Inicialización ---
 app = FastAPI()
-origins = ["*"]  # Para desarrollo. En producción, usá ["https://tu-dominio.com"]
+origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+origins = [o.strip() for o in origins_env.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
