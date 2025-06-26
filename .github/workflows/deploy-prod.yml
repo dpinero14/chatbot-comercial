@@ -2,7 +2,7 @@ name: Deploy to Cloud Run (PROD)
 
 on:
   push:
-    branches: [prod]  # Se ejecuta cuando hacés push a la rama 'prod'
+    branches: [prod]
 
 jobs:
   deploy:
@@ -19,6 +19,14 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
+    - name: Authenticate with service account
+      run: |
+        cat <<EOF > key.json
+        ${{ secrets.GCP_SA_KEY }}
+        EOF
+        gcloud auth activate-service-account --key-file=key.json
+        gcloud config set account $(gcloud auth list --filter="status:ACTIVE" --format="value(account)")
+
     - name: Deploy to Cloud Run (PROD)
       run: |
         gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/chatbot-comercial ./backend
@@ -27,3 +35,4 @@ jobs:
           --platform managed \
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated
+
