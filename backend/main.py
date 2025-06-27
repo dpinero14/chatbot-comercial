@@ -306,9 +306,24 @@ async def consultar_comercial(request: Request):
         return {"respuesta": "No se recibió una pregunta válida."}
 
     marca = extraer_marca(pregunta)
+    
+    # Si no hay marca, generá una respuesta amable igual
     if not marca:
-        return {"respuesta": "No pude detectar la marca mencionada."}
+        try:
+            respuesta_llm = client_llm.chat.completions.create(
+                model=deployment_llm,
+                messages=[
+                    {"role": "system", "content": "Sos un asistente que responde amablemente a cualquier consulta relacionada con atención interna o comerciales de cuentas."},
+                    {"role": "user", "content": pregunta}
+                ],
+                temperature=0.6
+            )
+            return {"respuesta": respuesta_llm.choices[0].message.content.strip()}
+        except Exception as e:
+            logging.error(f"[LLM] Error generando respuesta sin marca: {e}")
+            return {"respuesta": "No entendí tu mensaje, ¿podés reformularlo?"}
 
+    # Proceso normal si hay marca detectada
     resultado = buscar_comercial(marca)
     if not resultado or not resultado.get("ejecutivo"):
         return {"respuesta": f"No se encontró un comercial para la marca '{marca}'"}
