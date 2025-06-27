@@ -313,7 +313,12 @@ async def consultar_comercial(request: Request):
             respuesta_llm = client_llm.chat.completions.create(
                 model=deployment_llm,
                 messages=[
-                    {"role": "system", "content": "Sos un asistente que responde amablemente a cualquier consulta relacionada con atención interna o comerciales de cuentas."},
+                    {"role": "system", "content": (
+                        "Sos un asistente cordial que responde de forma breve, clara y profesional. "
+                        "Tu tarea es ayudar a personas de la empresa a conocer quién es el ejecutivo asignado a una cuenta o marca específica. "
+                        "Si el mensaje no tiene una marca conocida, saludá o pedí que reformulen la consulta. "
+                        "No prometas gestionar cuentas, facturación, ni brindar promociones."
+                        )},
                     {"role": "user", "content": pregunta}
                 ],
                 temperature=0.6
